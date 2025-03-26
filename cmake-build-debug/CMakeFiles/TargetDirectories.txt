@@ -1,0 +1,3 @@
+C:/Users/alek.walewski/CLionProjects/Oreopolis-mini-coursework/cmake-build-debug/CMakeFiles/Oreopolis_mini_coursework.dir
+C:/Users/alek.walewski/CLionProjects/Oreopolis-mini-coursework/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/alek.walewski/CLionProjects/Oreopolis-mini-coursework/cmake-build-debug/CMakeFiles/rebuild_cache.dir
