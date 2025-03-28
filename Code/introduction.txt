@@ -1,6 +1,7 @@
 Welcome to the Oreopolis mining game!
 The goal of the game is to navigate the depths of Oreopolis collecting gems and ores to then sell at the shop.
-Not only is your bag storage limited, but the more weight you carry the more energy you will use so make sure you keep an eye on your energy levels!
+Not only is your bag storage limited, but the more weight you carry the more energy you will use so make sure you keep
+an eye on your energy levels!
 
 TO BEGIN PRESS 1
 TO VIEW THE LEADERBOARD PRESS 2
