@@ -7,6 +7,7 @@ int main(){
     char readChar;
     int mainMenuOption = 0;
     cell map[mapSize][mapSize] = {};
+    player character;
 
     mainMenu:
     system("cls");
@@ -24,7 +25,7 @@ int main(){
         switch(mainMenuOption){
             case 49:
                 // Call initial game setup function
-                gameSetup(&map);
+                gameSetup(&map, &character);
                 break;
             case 50:
                 // Call function to read leaderboard
@@ -41,7 +42,8 @@ int main(){
     return 0;
 }
 
-void gameSetup(cell (*mapToInit)[mapSize]){
+// Initial game setup function to initialise game variables and structures
+void gameSetup(cell (*mapToInit)[mapSize], player *characterInit){
     int difficulty = 0, impassables, x, y;
     float gemRarityFactor, gemProbability;
     // Prompt user to select difficulty
@@ -53,16 +55,19 @@ void gameSetup(cell (*mapToInit)[mapSize]){
                 // Initiate easy difficulty variables
                 gemRarityFactor = easyRarityFactor;
                 impassables = easyImpassables;
+                characterInit->energy = easyPlayerEnergy;
                 break;
             case 50:
                 // Initiate normal difficulty variables
                 gemRarityFactor = normalRarityFactor;
                 impassables = normalImpassables;
+                characterInit->energy = normalPlayerEnergy;
                 break;
             case 51:
                 // Initiate hard mode difficulty
                 gemRarityFactor = hardRarityFactor;
                 impassables = hardImpassables;
+                characterInit->energy = hardPlayerEnergy;
                 break;
             default:
                 difficulty = 0;
@@ -70,13 +75,17 @@ void gameSetup(cell (*mapToInit)[mapSize]){
         }
     }
 
-    // Place shop in cell (0,0)
+    // Set character variables that are the same for every difficulty
+    characterInit->maximumWeight = 100;
+    characterInit->money = 0;
 
+    // Loop through map to place 'uninitialised' cells
     for (int x = 0; x < mapSize; ++x) {
         for (int y = 0; y < mapSize; ++y) {
             mapToInit[x][y] = uninitialised;
         }
     }
+    // Place shop in cell (0,0)
     mapToInit[0][0] = shopCell;
 
     // Place impassable cells at random map locations
