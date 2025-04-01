@@ -5,7 +5,7 @@
 
 int main(){
     char readChar;
-    int mainMenuOption = 0;
+    int mainMenuOption = 0, gameLoop = 1;
     cell map[mapSize][mapSize] = {};
     player character;
 
@@ -39,6 +39,26 @@ int main(){
                 break;
         }
     }
+
+    printf("\nGame initiated successfully, good luck!");
+    delay(1);
+
+    // Main game loop
+    while(gameLoop==1){
+        // Check if character is out of energy and run end game function if true
+        if(character.energy == 0){
+            //endGame();
+            break;
+        }
+
+        // Output map function
+        system("cls");
+        printf("Map:\n");
+        displayMap(&map, character.xCoordinate, character.yCoordinate);
+        getchar();
+
+    }
+
     return 0;
 }
 
@@ -78,6 +98,8 @@ void gameSetup(cell (*mapToInit)[mapSize], player *characterInit){
     // Set character variables that are the same for every difficulty
     characterInit->maximumWeight = 100;
     characterInit->money = 0;
+    characterInit->xCoordinate = 0;
+    characterInit->yCoordinate = 0;
 
     // Loop through map to place 'uninitialised' cells
     for (int x = 0; x < mapSize; ++x) {
@@ -132,4 +154,33 @@ void gameSetup(cell (*mapToInit)[mapSize], player *characterInit){
             }
         }
     }
+}
+
+// Function to output a formatted map
+void displayMap(cell (*mapToDisplay)[mapSize], int characterX, int characterY){
+    // Initialise blank output map
+    char outputMap[mapSize][mapSize] = {};
+
+    // Place character in correct location
+    outputMap[characterX][characterY] = '0';
+
+    // Fill output map with icons
+    for (int x = 0; x < mapSize; ++x) {
+        for (int y = 0; y < mapSize; ++y) {
+            if(outputMap[x][y] != '0') {
+                outputMap[x][y] = mapToDisplay[x][y].icon;
+            }
+        }
+    }
+
+    // Output map
+    printf(".------------------------------.\n");
+    for (int x = 0; x< mapSize; ++x) {
+        printf("|");
+        for (int y = 0; y < mapSize; ++y) {
+            printf("%c  ", outputMap[x][y]);
+        }
+        printf("|\n");
+    }
+    printf(".------------------------------.\n");
 }

@@ -50,7 +50,7 @@ cell diamond = {.icon='D', .mineable=1, .item={.name="Diamond", .value=5, .weigh
 cell ground = {.icon=' ', .mineable=0};
 
 typedef struct player{
-    int energy, maximumWeight, money;
+    int energy, maximumWeight, money, xCoordinate, yCoordinate;
     mineableItem inventory[10];
 } player;
 
@@ -75,3 +75,8 @@ int getKey(){
 
 void gameSetup(cell (*mapToInit)[mapSize], player *characterInit);
 void endGame();
+void displayMap(cell (*mapToDisplay)[mapSize], int characterX, int characterY);
+void moveCharacter();
+void mineItem();
+void viewInventory();
+void openShop();
