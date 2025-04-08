@@ -41,6 +41,7 @@ typedef struct cell{
     char icon;
 } cell;
 
+mineableItem none = {};
 cell uninitialised = {.icon='U'};
 cell shopCell = {.icon='$', .mineable=0};
 cell impassableCell = {.icon='X', .mineable=0};
@@ -50,8 +51,9 @@ cell diamond = {.icon='D', .mineable=1, .item={.name="Diamond", .value=5, .weigh
 cell ground = {.icon=' ', .mineable=0};
 
 typedef struct player{
-    int energy, maximumWeight, money, xCoordinate, yCoordinate;
+    int energy, maximumWeight, weightInBag, money, xCoordinate, yCoordinate;
     mineableItem inventory[10];
+    char name[20];
 } player;
 
 // Delay function to allow for time delay between events
@@ -78,5 +80,5 @@ void endGame();
 void displayMap(cell (*mapToDisplay)[mapSize], int characterX, int characterY);
 void moveCharacter();
 void mineItem();
-void viewInventory();
+void viewInventory(player *characterPlayer);
 void openShop();

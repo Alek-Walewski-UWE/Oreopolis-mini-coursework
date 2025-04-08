@@ -5,9 +5,9 @@
 
 int main(){
     char readChar;
-    int mainMenuOption = 0, gameLoop = 1;
+    int userInput = 0, gameLoop = 1;
     cell map[mapSize][mapSize] = {};
-    player character;
+    player character = {};
 
     mainMenu:
     system("cls");
@@ -20,28 +20,30 @@ int main(){
     fclose(currentFile);
 
     // Allow user to choose menu option
-    while(mainMenuOption == 0){
-        mainMenuOption = getKey();
-        switch(mainMenuOption){
+    while(userInput == 0){
+        userInput = getKey();
+        switch(userInput){
             case 49:
                 // Call initial game setup function
                 gameSetup(&map, &character);
+                // Take player name input
+                printf("\nPlease enter your player name: ");
+                scanf("%s", &character.name);
+
+                printf("\nGame initiated successfully, good luck!");
+                delay(1);
                 break;
             case 50:
                 // Call function to read leaderboard
 
-                goto mainMenu;
                 break;
             case 51:
                 return 0;
             default:
-                mainMenuOption = 0;
+                userInput = 0;
                 break;
         }
     }
-
-    printf("\nGame initiated successfully, good luck!");
-    delay(1);
 
     // Main game loop
     while(gameLoop==1){
@@ -53,10 +55,34 @@ int main(){
 
         // Output map function
         system("cls");
-        printf("Map:\n");
         displayMap(&map, character.xCoordinate, character.yCoordinate);
-        getchar();
 
+        // Output player stats
+        printf("\nPlayer %s stats:\n Energy: %d\n Money: %d\n Weight in bag: %d/%d", character.name, character.energy, character.money, character.weightInBag, character.maximumWeight);
+
+        // Output player options
+        printf("\nUse arrow keys to move in selected direction");
+        // Display shop or mining option only if standing on a suitable cell
+        if(map[character.xCoordinate][character.yCoordinate].icon == '$'){
+            printf(", E to open the shop");
+        } else if(map[character.xCoordinate][character.yCoordinate].mineable == 1){
+            printf(", E to mine item");
+        }
+        printf(" or I for inventory");
+
+        // Wait valid user input
+        userInput = 0;
+        while(userInput == 0){
+            userInput = getKey();
+            switch (userInput) {
+                case 105:
+                    viewInventory(&character);
+                    break;
+                default:
+                    userInput = 0;
+                    break;
+            }
+        }
     }
 
     return 0;
@@ -97,6 +123,7 @@ void gameSetup(cell (*mapToInit)[mapSize], player *characterInit){
 
     // Set character variables that are the same for every difficulty
     characterInit->maximumWeight = 100;
+    characterInit->weightInBag = 0;
     characterInit->money = 0;
     characterInit->xCoordinate = 0;
     characterInit->yCoordinate = 0;
@@ -183,4 +210,85 @@ void displayMap(cell (*mapToDisplay)[mapSize], int characterX, int characterY){
         printf("|\n");
     }
     printf(".------------------------------.\n");
+}
+
+// Function to display player inventory and allow inventory management
+void viewInventory(player *characterPlayer){
+    int selected=0, inventoryInput, inventorySize = (sizeof(characterPlayer->inventory) / sizeof(mineableItem));
+    ViewInventoryStart:
+    inventoryInput = 0;
+
+    system("cls");
+    // Display player info
+    printf("\nPlayer %s stats:\n Energy: %d\n Money: %d\n Weight in bag: %d/%d", characterPlayer->name, characterPlayer->energy, characterPlayer->money, characterPlayer->weightInBag, characterPlayer->maximumWeight);
+    printf("\n\nInventory:\n");
+    // Loop through inventory and output name
+    for (int i = 0; i < inventorySize; ++i) {
+        printf("%-9s|", characterPlayer->inventory[i].name);
+    }
+    printf("\n");
+    // Loop to show which item is currently selected
+    for (int i = 0; i < inventorySize; ++i) {
+        if (i== selected){
+            printf("^^^^^^^^^ ");
+        } else{
+            printf("          ");
+        }
+    }
+
+    // Show selected item details
+    printf("\nSelected item:\n Weight: %d\n Value: %d", characterPlayer->inventory[selected].weight, characterPlayer->inventory[selected].value);
+
+    printf("\n\nUse arrow keys to navigate inventory, D to delete an item from your inventory or E to exit the inventory");
+    while(inventoryInput == 0){
+        inventoryInput = getKey();
+        delay(0.5);
+        switch (inventoryInput) {
+            case 101:
+                // Exit inventory
+                break;
+            case 100:
+                // Check if item at selection
+                if (characterPlayer->inventory[selected].value != 0){
+                    // Confirm removal of item
+                    printf("\nAre you sure you want to delete %s? Yes(1) or No(2)");
+                    inventoryInput = 0;
+                    while (inventoryInput == 0){
+                        inventoryInput = getKey();
+                        switch (inventoryInput) {
+                            case 49:
+                                // Delete item
+                                characterPlayer->inventory[selected] = none;
+                                printf("\nItem Removed");
+                                delay(1);
+                                break;
+                            case 50:
+                                // Cancel
+                                break;
+                            default:
+                                inventoryInput = 0;
+                                break;
+                        }
+                    }
+                }
+                goto ViewInventoryStart;
+            case 77:
+                // Move selection right if not at end of list
+                if (selected < inventorySize-1){
+                    selected++;
+                }
+                goto ViewInventoryStart;
+                break;
+            case 75:
+                // Move selection left if not at beginning of list
+                if (selected > 0){
+                    selected--;
+                }
+                goto ViewInventoryStart;
+                break;
+            default:
+                inventoryInput = 0;
+                break;
+        }
+    }
 }
