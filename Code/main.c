@@ -6,7 +6,7 @@
 int main(){
     char readChar;
     int userInput = 0, gameLoop = 1;
-    cell map[mapSize][mapSize] = {};
+    cell map[MAPSIZE][MAPSIZE] = {};
     player character = {};
 
     mainMenu:
@@ -78,6 +78,22 @@ int main(){
                 case 105:
                     viewInventory(&character);
                     break;
+                case 77:
+                    // Right
+                    moveCharacter(1, &character, &map);
+                    break;
+                case 75:
+                    // Left
+                    moveCharacter(2, &character, &map);
+                    break;
+                case 72:
+                    // Up
+                    moveCharacter(3, &character, &map);
+                    break;
+                case 80:
+                    // Down
+                    moveCharacter(4, &character, &map);
+                    break;
                 default:
                     userInput = 0;
                     break;
@@ -89,7 +105,7 @@ int main(){
 }
 
 // Initial game setup function to initialise game variables and structures
-void gameSetup(cell (*mapToInit)[mapSize], player *characterInit){
+void gameSetup(cell (*mapToInit)[MAPSIZE], player *characterInit){
     int difficulty = 0, impassables, x, y;
     float gemRarityFactor, gemProbability;
     // Prompt user to select difficulty
@@ -129,8 +145,8 @@ void gameSetup(cell (*mapToInit)[mapSize], player *characterInit){
     characterInit->yCoordinate = 0;
 
     // Loop through map to place 'uninitialised' cells
-    for (int x = 0; x < mapSize; ++x) {
-        for (int y = 0; y < mapSize; ++y) {
+    for (int y = 0; y < MAPSIZE; ++y) {
+        for (int x = 0; x < MAPSIZE; ++x) {
             mapToInit[x][y] = uninitialised;
         }
     }
@@ -140,8 +156,8 @@ void gameSetup(cell (*mapToInit)[mapSize], player *characterInit){
     // Place impassable cells at random map locations
     while(impassables != 0){
         srand(time(NULL));
-        x = rand() % mapSize;
-        y = rand() % mapSize;
+        x = rand() % MAPSIZE;
+        y = rand() % MAPSIZE;
         // Check if cell is already populated
         if(mapToInit[x][y].icon != 'U'){
             continue;
@@ -152,8 +168,8 @@ void gameSetup(cell (*mapToInit)[mapSize], player *characterInit){
     }
 
     // Loop through each cell and place a random cell
-    for (x = 0; x < mapSize; ++x) {
-        for (int y = 0; y < mapSize; ++y) {
+    for (y = 0; y < MAPSIZE; ++y) {
+        for (int x = 0; x < MAPSIZE; ++x) {
             if(mapToInit[x][y].icon != 'U'){
                 continue;
             }else{
@@ -184,16 +200,16 @@ void gameSetup(cell (*mapToInit)[mapSize], player *characterInit){
 }
 
 // Function to output a formatted map
-void displayMap(cell (*mapToDisplay)[mapSize], int characterX, int characterY){
+void displayMap(cell (*mapToDisplay)[MAPSIZE], int characterX, int characterY){
     // Initialise blank output map
-    char outputMap[mapSize][mapSize] = {};
+    char outputMap[MAPSIZE][MAPSIZE] = {};
 
     // Place character in correct location
     outputMap[characterX][characterY] = '0';
 
     // Fill output map with icons
-    for (int x = 0; x < mapSize; ++x) {
-        for (int y = 0; y < mapSize; ++y) {
+    for (int y = 0; y < MAPSIZE; ++y) {
+        for (int x = 0; x < MAPSIZE; ++x) {
             if(outputMap[x][y] != '0') {
                 outputMap[x][y] = mapToDisplay[x][y].icon;
             }
@@ -202,9 +218,9 @@ void displayMap(cell (*mapToDisplay)[mapSize], int characterX, int characterY){
 
     // Output map
     printf(".------------------------------.\n");
-    for (int x = 0; x< mapSize; ++x) {
+    for (int y = 0; y< MAPSIZE; ++y) {
         printf("|");
-        for (int y = 0; y < mapSize; ++y) {
+        for (int x = 0; x < MAPSIZE; ++x) {
             printf("%c  ", outputMap[x][y]);
         }
         printf("|\n");
@@ -276,6 +292,8 @@ void viewInventory(player *characterPlayer){
                 // Move selection right if not at end of list
                 if (selected < inventorySize-1){
                     selected++;
+                } else{
+                    printf("\a");
                 }
                 goto ViewInventoryStart;
                 break;
@@ -283,6 +301,8 @@ void viewInventory(player *characterPlayer){
                 // Move selection left if not at beginning of list
                 if (selected > 0){
                     selected--;
+                } else{
+                    printf("\a");
                 }
                 goto ViewInventoryStart;
                 break;
@@ -291,4 +311,43 @@ void viewInventory(player *characterPlayer){
                 break;
         }
     }
+}
+
+void moveCharacter(int direction, player *characterToMove, cell (*mapToCheckMovement)[MAPSIZE]){
+    int newX=0, newY=0;
+    switch (direction) {
+        case 1:
+            // Right
+            newX = characterToMove->xCoordinate + 1;
+            newY = characterToMove->yCoordinate;
+            break;
+        case 2:
+            // Left
+            newX = characterToMove->xCoordinate - 1;
+            newY = characterToMove->yCoordinate;
+            break;
+        case 3:
+            // Up
+            newX = characterToMove->xCoordinate;
+            newY = characterToMove->yCoordinate - 1;
+            break;
+        case 4:
+            // Down
+            newX = characterToMove->xCoordinate;
+            newY = characterToMove->yCoordinate + 1;
+            break;
+        default:
+            return;
+    }
+
+    if (!((newX >= MAPSIZE) | (newX < 0) | (newY >= MAPSIZE) | (newY < 0))){
+        if (mapToCheckMovement[newX][newY].icon != 'X'){
+            characterToMove->xCoordinate = newX;
+            characterToMove->yCoordinate = newY;
+
+            characterToMove->energy -= 1 + (characterToMove->weightInBag * DEPLETIONFACTOR);
+            return;
+        }
+    }
+    printf("\a");
 }

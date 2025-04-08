@@ -28,7 +28,9 @@ FILE* currentFile;
 #define hardImpassables 4
 #define hardPlayerEnergy 100
 
-#define mapSize 10
+#define DEPLETIONFACTOR 0.2
+
+#define MAPSIZE 10
 
 typedef struct mineableItem{
     float value, rarity, weight;
@@ -75,10 +77,10 @@ int getKey(){
     }
 }
 
-void gameSetup(cell (*mapToInit)[mapSize], player *characterInit);
+void gameSetup(cell (*mapToInit)[MAPSIZE], player *characterInit);
 void endGame();
-void displayMap(cell (*mapToDisplay)[mapSize], int characterX, int characterY);
-void moveCharacter();
+void displayMap(cell (*mapToDisplay)[MAPSIZE], int characterX, int characterY);
+void moveCharacter(int direction, player *characterToMove, cell (*mapToCheckMovement)[MAPSIZE]);
 void mineItem();
 void viewInventory(player *characterPlayer);
 void openShop();
