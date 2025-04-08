@@ -7,6 +7,7 @@ int main(){
     char readChar;
     int userInput = 0, gameLoop = 1;
     cell map[MAPSIZE][MAPSIZE] = {};
+    mineableItem currentItem;
     player character = {};
 
     mainMenu:
@@ -61,14 +62,15 @@ int main(){
         printf("\nPlayer %s stats:\n Energy: %d\n Money: %d\n Weight in bag: %d/%d", character.name, character.energy, character.money, character.weightInBag, character.maximumWeight);
 
         // Output player options
-        printf("\nUse arrow keys to move in selected direction");
+        printf("\nUse arrow keys to move in selected direction, I for inventory");
         // Display shop or mining option only if standing on a suitable cell
         if(map[character.xCoordinate][character.yCoordinate].icon == '$'){
-            printf(", E to open the shop");
+            printf(" or E to open the shop");
         } else if(map[character.xCoordinate][character.yCoordinate].mineable == 1){
-            printf(", E to mine item");
+            currentItem = map[character.xCoordinate][character.yCoordinate].item;
+            printf(" or E to mine item: %s\n Value: %.0f\n Weight: %.0f", currentItem.name, currentItem.value, currentItem.weight);
         }
-        printf(" or I for inventory");
+
 
         // Wait valid user input
         userInput = 0;
@@ -317,22 +319,22 @@ void moveCharacter(int direction, player *characterToMove, cell (*mapToCheckMove
     int newX=0, newY=0;
     switch (direction) {
         case 1:
-            // Right
+            // Move player right
             newX = characterToMove->xCoordinate + 1;
             newY = characterToMove->yCoordinate;
             break;
         case 2:
-            // Left
+            // Move player left
             newX = characterToMove->xCoordinate - 1;
             newY = characterToMove->yCoordinate;
             break;
         case 3:
-            // Up
+            // Move player up
             newX = characterToMove->xCoordinate;
             newY = characterToMove->yCoordinate - 1;
             break;
         case 4:
-            // Down
+            // Move player down
             newX = characterToMove->xCoordinate;
             newY = characterToMove->yCoordinate + 1;
             break;
@@ -340,7 +342,9 @@ void moveCharacter(int direction, player *characterToMove, cell (*mapToCheckMove
             return;
     }
 
+    // Check new coordinates won't place player out of map
     if (!((newX >= MAPSIZE) | (newX < 0) | (newY >= MAPSIZE) | (newY < 0))){
+        // Check new coordinates won't place player at impassable cell
         if (mapToCheckMovement[newX][newY].icon != 'X'){
             characterToMove->xCoordinate = newX;
             characterToMove->yCoordinate = newY;
