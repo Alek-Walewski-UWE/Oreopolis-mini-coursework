@@ -15,32 +15,37 @@
 #define introductionFile "../Code/introduction.txt"
 FILE* currentFile;
 
-#define easyText "\nEasy(1): 2x chance of rare gems, 200 energy, no impassable cells\n"
-#define easyRarityFactor 2
+#define easyText "\nEasy(1): Highest chance of rare gems, 200 energy, no impassable cells\n"
+#define easyRarityFactor 3
 #define easyImpassables 0
 #define easyPlayerEnergy 200
-#define normalText "\nNormal(2): 1x chance of rare gems, 150 energy points, 2 impassable cells\n"
-#define normalRarityFactor 1
-#define normalImpassables 2
+#define normalText "\nNormal(2): Normal chance of rare gems, 150 energy points, 6 impassable cells\n"
+#define normalRarityFactor 2
+#define normalImpassables 6
 #define normalPlayerEnergy 150
-#define hardText "\nHard(3): 0.75x chance of rare gems, 100 energy points, 4 impassable cells\n"
-#define hardRarityFactor 0.75
-#define hardImpassables 4
+#define hardText "\nHard(3): Decreased chance of rare gems, 100 energy points, 10 impassable cells\n"
+#define hardRarityFactor 1.5
+#define hardImpassables 10
 #define hardPlayerEnergy 100
 
-#define mapSize 10
+#define DEPLETIONFACTOR 0.2
 
-typedef struct mineableItem{
-    float value, rarity, weight;
+#define MAPSIZE 10
+#define MONEYTOWIN 20
+
+typedef struct{
+    int value, weight;
+    float rarity;
     char name[15];
 }mineableItem;
 
-typedef struct cell{
+typedef struct{
     int mineable;
     mineableItem item;
     char icon;
 } cell;
 
+mineableItem none = {};
 cell uninitialised = {.icon='U'};
 cell shopCell = {.icon='$', .mineable=0};
 cell impassableCell = {.icon='X', .mineable=0};
@@ -49,10 +54,18 @@ cell goldOre = {.icon='G', .mineable=1, .item={.name="Gold Ore", .value=2, .weig
 cell diamond = {.icon='D', .mineable=1, .item={.name="Diamond", .value=5, .weight=5, .rarity = 0.01}};
 cell ground = {.icon=' ', .mineable=0};
 
-typedef struct player{
-    int energy, maximumWeight, money;
+typedef struct{
+    int energy, defaultEnergy, maximumWeight, weightInBag, money, xCoordinate, yCoordinate, itemsInInventory;
     mineableItem inventory[10];
+    char name[20];
 } player;
+
+typedef struct{
+    char name[20];
+    int value, cost, available;
+} upgrade;
+
+upgrade bag1 = {.name="Bag upgrade 1", .value=20, .cost=10, .available=1};
 
 // Delay function to allow for time delay between events
 void delay(int delayTime){
@@ -73,5 +86,15 @@ int getKey(){
     }
 }
 
-void gameSetup(cell (*mapToInit)[mapSize], player *characterInit);
-void endGame();
+// Function to output player stats
+void showPlayerStats(player *playerStats){
+    printf("\nPlayer %s stats:\n Energy: %d/%d\n Money: %d\n Weight in bag: %d/%d", playerStats->name, playerStats->energy, playerStats->defaultEnergy, playerStats->money, playerStats->weightInBag, playerStats->maximumWeight);
+}
+
+void gameSetup(cell (*mapToInit)[MAPSIZE], player *characterInit);
+void endGame(player *endPlayer, int endState);
+void displayMap(cell (*mapToDisplay)[MAPSIZE], int characterX, int characterY);
+void moveCharacter(int direction, player *characterToMove, cell (*mapToCheckMovement)[MAPSIZE]);
+void mineItem(cell (*mapToEdit)[MAPSIZE], player *playerMining);
+void viewInventory(player *characterPlayer);
+void openShop(player *characterPlayer);
