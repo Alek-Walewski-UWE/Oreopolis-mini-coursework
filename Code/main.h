@@ -15,17 +15,17 @@
 #define introductionFile "../Code/introduction.txt"
 FILE* currentFile;
 
-#define easyText "\nEasy(1): 2x chance of rare gems, 200 energy, no impassable cells\n"
-#define easyRarityFactor 2
+#define easyText "\nEasy(1): Highest chance of rare gems, 200 energy, no impassable cells\n"
+#define easyRarityFactor 3
 #define easyImpassables 0
 #define easyPlayerEnergy 200
-#define normalText "\nNormal(2): 1x chance of rare gems, 150 energy points, 2 impassable cells\n"
-#define normalRarityFactor 1
-#define normalImpassables 2
+#define normalText "\nNormal(2): Normal chance of rare gems, 150 energy points, 6 impassable cells\n"
+#define normalRarityFactor 2
+#define normalImpassables 6
 #define normalPlayerEnergy 150
-#define hardText "\nHard(3): 0.75x chance of rare gems, 100 energy points, 4 impassable cells\n"
-#define hardRarityFactor 0.75
-#define hardImpassables 4
+#define hardText "\nHard(3): Decreased chance of rare gems, 100 energy points, 10 impassable cells\n"
+#define hardRarityFactor 1.5
+#define hardImpassables 10
 #define hardPlayerEnergy 100
 
 #define DEPLETIONFACTOR 0.2
@@ -65,7 +65,7 @@ typedef struct{
     int value, cost, available;
 } upgrade;
 
-upgrade bag1 = {.name="Bag upgrade 1", .value=200, .cost=10, .available=1};
+upgrade bag1 = {.name="Bag upgrade 1", .value=20, .cost=10, .available=1};
 
 // Delay function to allow for time delay between events
 void delay(int delayTime){
@@ -92,7 +92,7 @@ void showPlayerStats(player *playerStats){
 }
 
 void gameSetup(cell (*mapToInit)[MAPSIZE], player *characterInit);
-void endGame();
+void endGame(player *endPlayer, int endState);
 void displayMap(cell (*mapToDisplay)[MAPSIZE], int characterX, int characterY);
 void moveCharacter(int direction, player *characterToMove, cell (*mapToCheckMovement)[MAPSIZE]);
 void mineItem(cell (*mapToEdit)[MAPSIZE], player *playerMining);

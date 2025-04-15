@@ -50,8 +50,8 @@ int main(){
     // Main game loop
     while(1){
         // Check if character is out of energy and run end game function if true
-        if(character.energy == 0){
-            //endGame();
+        if(character.energy <= 0){
+            endGame(&character, 2);
             break;
         }
 
@@ -90,6 +90,10 @@ int main(){
                     }else if(map[character.xCoordinate][character.yCoordinate].icon == '$'){
                         // View shop
                         openShop(&character);
+                        if(character.money >= MONEYTOWIN){
+                            endGame(&character, 1);
+                            return 0;
+                        }
                     }
                     break;
                 case 77:
@@ -155,7 +159,7 @@ void gameSetup(cell (*mapToInit)[MAPSIZE], player *characterInit){
     }
 
     // Set character variables that are the same for every difficulty
-    characterInit->maximumWeight = 100;
+    characterInit->maximumWeight = 10;
     characterInit->weightInBag = 0;
     characterInit->money = 0;
     characterInit->xCoordinate = 0;
@@ -491,4 +495,24 @@ void openShop(player *shopPlayer){
                 break;
         }
     }
+}
+
+// Function to end the game
+void endGame(player *endPlayer, int endState){
+    system("cls");
+    switch (endState) {
+        case 1:
+            // Win
+            printf("\nCongratulations you have won the game!");
+            break;
+        case 2:
+            // Lose
+            printf("\nYou have lost the game!");
+            break;
+        default:
+            break;
+    }
+    showPlayerStats(endPlayer);
+    printf("\nPress enter to end the game");
+    getch();
 }
