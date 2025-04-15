@@ -31,14 +31,15 @@ FILE* currentFile;
 #define DEPLETIONFACTOR 0.2
 
 #define MAPSIZE 10
+#define MONEYTOWIN 20
 
-typedef struct mineableItem{
+typedef struct{
     int value, weight;
     float rarity;
     char name[15];
 }mineableItem;
 
-typedef struct cell{
+typedef struct{
     int mineable;
     mineableItem item;
     char icon;
@@ -53,11 +54,18 @@ cell goldOre = {.icon='G', .mineable=1, .item={.name="Gold Ore", .value=2, .weig
 cell diamond = {.icon='D', .mineable=1, .item={.name="Diamond", .value=5, .weight=5, .rarity = 0.01}};
 cell ground = {.icon=' ', .mineable=0};
 
-typedef struct player{
-    int energy, maximumWeight, weightInBag, money, xCoordinate, yCoordinate, itemsInInventory;
+typedef struct{
+    int energy, defaultEnergy, maximumWeight, weightInBag, money, xCoordinate, yCoordinate, itemsInInventory;
     mineableItem inventory[10];
     char name[20];
 } player;
+
+typedef struct{
+    char name[20];
+    int value, cost, available;
+} upgrade;
+
+upgrade bag1 = {.name="Bag upgrade 1", .value=200, .cost=10, .available=1};
 
 // Delay function to allow for time delay between events
 void delay(int delayTime){
@@ -78,10 +86,15 @@ int getKey(){
     }
 }
 
+// Function to output player stats
+void showPlayerStats(player *playerStats){
+    printf("\nPlayer %s stats:\n Energy: %d/%d\n Money: %d\n Weight in bag: %d/%d", playerStats->name, playerStats->energy, playerStats->defaultEnergy, playerStats->money, playerStats->weightInBag, playerStats->maximumWeight);
+}
+
 void gameSetup(cell (*mapToInit)[MAPSIZE], player *characterInit);
 void endGame();
 void displayMap(cell (*mapToDisplay)[MAPSIZE], int characterX, int characterY);
 void moveCharacter(int direction, player *characterToMove, cell (*mapToCheckMovement)[MAPSIZE]);
 void mineItem(cell (*mapToEdit)[MAPSIZE], player *playerMining);
 void viewInventory(player *characterPlayer);
-void openShop();
+void openShop(player *characterPlayer);

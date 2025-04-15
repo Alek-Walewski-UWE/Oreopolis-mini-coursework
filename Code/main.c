@@ -5,10 +5,11 @@
 
 int main(){
     char readChar;
-    int userInput = 0, gameLoop = 1;
+    int userInput = 0;
     cell map[MAPSIZE][MAPSIZE] = {};
     mineableItem currentItem;
     player character = {};
+    srand(time(NULL));
 
     mainMenu:
     system("cls");
@@ -47,7 +48,7 @@ int main(){
     }
 
     // Main game loop
-    while(gameLoop==1){
+    while(1){
         // Check if character is out of energy and run end game function if true
         if(character.energy == 0){
             //endGame();
@@ -59,16 +60,17 @@ int main(){
         displayMap(&map, character.xCoordinate, character.yCoordinate);
 
         // Output player stats
-        printf("\nPlayer %s stats:\n Energy: %d\n Money: %d\n Weight in bag: %d/%d", character.name, character.energy, character.money, character.weightInBag, character.maximumWeight);
+        showPlayerStats(&character);
 
         // Output player options
         printf("\nUse arrow keys to move in selected direction, I for inventory");
         // Display shop or mining option only if standing on a suitable cell
         if(map[character.xCoordinate][character.yCoordinate].icon == '$'){
             printf(" or E to open the shop");
+            character.energy = character.defaultEnergy;
         } else if(map[character.xCoordinate][character.yCoordinate].mineable == 1){
             currentItem = map[character.xCoordinate][character.yCoordinate].item;
-            printf(" or E to mine item: \n %s\n Value: %.0f\n Weight: %d", currentItem.name, currentItem.value, currentItem.weight);
+            printf(" or E to mine item: \n %s\n Value: %d\n Weight: %d", currentItem.name, currentItem.value, currentItem.weight);
         }
 
 
@@ -87,6 +89,7 @@ int main(){
                         mineItem(map, &character);
                     }else if(map[character.xCoordinate][character.yCoordinate].icon == '$'){
                         // View shop
+                        openShop(&character);
                     }
                     break;
                 case 77:
@@ -129,18 +132,21 @@ void gameSetup(cell (*mapToInit)[MAPSIZE], player *characterInit){
                 gemRarityFactor = easyRarityFactor;
                 impassables = easyImpassables;
                 characterInit->energy = easyPlayerEnergy;
+                characterInit->defaultEnergy = easyPlayerEnergy;
                 break;
             case 50:
                 // Initiate normal difficulty variables
                 gemRarityFactor = normalRarityFactor;
                 impassables = normalImpassables;
                 characterInit->energy = normalPlayerEnergy;
+                characterInit->defaultEnergy = normalPlayerEnergy;
                 break;
             case 51:
                 // Initiate hard mode difficulty
                 gemRarityFactor = hardRarityFactor;
                 impassables = hardImpassables;
                 characterInit->energy = hardPlayerEnergy;
+                characterInit->defaultEnergy = hardPlayerEnergy;
                 break;
             default:
                 difficulty = 0;
@@ -167,7 +173,6 @@ void gameSetup(cell (*mapToInit)[MAPSIZE], player *characterInit){
 
     // Place impassable cells at random map locations
     while(impassables != 0){
-        srand(time(NULL));
         x = rand() % MAPSIZE;
         y = rand() % MAPSIZE;
         // Check if cell is already populated
@@ -391,5 +396,99 @@ void mineItem(cell (*mapToEdit)[MAPSIZE], player *playerMining){
         // Set item in map to ground
         mapToEdit[x][y] = ground;
         delay(1);
+    }
+}
+
+// Function to allow selling and upgrading in shop
+void openShop(player *shopPlayer){
+    int shopSelection, moneyToReceive;
+
+    ShopView:
+    shopSelection = 0, moneyToReceive = 0;
+    system("cls");
+    showPlayerStats(shopPlayer);
+    printf("\nPress (1) to view the sell section of the shop, (2) to view the upgrade section or (E) to exit the shop.");
+    while (shopSelection == 0){
+        shopSelection = getKey();
+        switch (shopSelection) {
+            case 49:
+                // Sell section of shop
+                system("cls");
+                showPlayerStats(shopPlayer);
+
+                // Calculate money to receive
+                for (int i = 0; i < (sizeof(shopPlayer->inventory) / sizeof(mineableItem)); ++i) {
+                    moneyToReceive += shopPlayer->inventory[i].value;
+                }
+
+                printf("\nWould you like to sell all your items? You will receive %d money.\n(1) Yes or (2) No", moneyToReceive);
+                shopSelection = 0;
+
+                while(shopSelection == 0){
+                    shopSelection = getKey();
+                    switch (shopSelection) {
+                        case 49:
+                            // Sell items
+                            shopPlayer->money += moneyToReceive;
+                            // Reset items in inventory
+                            for (int i = 0; i < (sizeof(shopPlayer->inventory) / sizeof(mineableItem)); ++i) {
+                                shopPlayer->inventory[i] = none;
+                            }
+                            shopPlayer->itemsInInventory = 0;
+                            shopPlayer->weightInBag = 0;
+                            printf("\nItems sold successfully!");
+                            delay(1.5);
+
+                        case 50:
+                            // Cancel sell
+                            break;
+                        default:
+                            shopSelection = 0;
+                            break;
+                    }
+                }
+                goto ShopView;
+            case 50:
+                // Upgrade section of shop
+                system("cls");
+                showPlayerStats(shopPlayer);
+                if (bag1.available){
+                    printf("\nUpgrades available: \n (1) %s: \n  Current weight capacity: %d \n  New weight capacity: %d \n  Upgrade Cost: %d", bag1.name, shopPlayer->maximumWeight, bag1.value, bag1.cost);
+
+                    shopSelection = 0;
+                    while (shopSelection == 0){
+                        shopSelection = getKey();
+                        switch (shopSelection){
+                            case 49:
+                                // Upgrade bag
+                                if (shopPlayer->money >= bag1.cost){
+                                    shopPlayer->maximumWeight = bag1.value;
+                                    shopPlayer->money -= bag1.cost;
+                                    bag1.available = 0;
+                                    printf("\nBag upgraded successfully!");
+                                    delay(1.5);
+                                }else{
+                                    printf("\nNot enough money to upgrade");
+                                    delay(1.5);
+                                }
+                                break;
+                            default:
+                                shopSelection = 0;
+                                break;
+                        }
+                    }
+                } else{
+                    printf("\nNo upgrades available!");
+                    delay(1.5);
+                }
+
+                goto ShopView;
+            case 101:
+                // Exit shop
+                return;
+            default:
+                shopSelection = 0;
+                break;
+        }
     }
 }
