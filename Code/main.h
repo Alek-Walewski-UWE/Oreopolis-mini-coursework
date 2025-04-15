@@ -33,7 +33,8 @@ FILE* currentFile;
 #define MAPSIZE 10
 
 typedef struct mineableItem{
-    float value, rarity, weight;
+    int value, weight;
+    float rarity;
     char name[15];
 }mineableItem;
 
@@ -53,7 +54,7 @@ cell diamond = {.icon='D', .mineable=1, .item={.name="Diamond", .value=5, .weigh
 cell ground = {.icon=' ', .mineable=0};
 
 typedef struct player{
-    int energy, maximumWeight, weightInBag, money, xCoordinate, yCoordinate;
+    int energy, maximumWeight, weightInBag, money, xCoordinate, yCoordinate, itemsInInventory;
     mineableItem inventory[10];
     char name[20];
 } player;
@@ -81,6 +82,6 @@ void gameSetup(cell (*mapToInit)[MAPSIZE], player *characterInit);
 void endGame();
 void displayMap(cell (*mapToDisplay)[MAPSIZE], int characterX, int characterY);
 void moveCharacter(int direction, player *characterToMove, cell (*mapToCheckMovement)[MAPSIZE]);
-void mineItem();
+void mineItem(cell (*mapToEdit)[MAPSIZE], player *playerMining);
 void viewInventory(player *characterPlayer);
 void openShop();

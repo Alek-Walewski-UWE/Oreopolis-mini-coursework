@@ -68,7 +68,7 @@ int main(){
             printf(" or E to open the shop");
         } else if(map[character.xCoordinate][character.yCoordinate].mineable == 1){
             currentItem = map[character.xCoordinate][character.yCoordinate].item;
-            printf(" or E to mine item: %s\n Value: %.0f\n Weight: %.0f", currentItem.name, currentItem.value, currentItem.weight);
+            printf(" or E to mine item: \n %s\n Value: %.0f\n Weight: %d", currentItem.name, currentItem.value, currentItem.weight);
         }
 
 
@@ -78,7 +78,16 @@ int main(){
             userInput = getKey();
             switch (userInput) {
                 case 105:
+                    // View Inventory
                     viewInventory(&character);
+                    break;
+                case 101:
+                    // Mine item
+                    if (map[character.xCoordinate][character.yCoordinate].mineable){
+                        mineItem(map, &character);
+                    }else if(map[character.xCoordinate][character.yCoordinate].icon == '$'){
+                        // View shop
+                    }
                     break;
                 case 77:
                     // Right
@@ -145,6 +154,7 @@ void gameSetup(cell (*mapToInit)[MAPSIZE], player *characterInit){
     characterInit->money = 0;
     characterInit->xCoordinate = 0;
     characterInit->yCoordinate = 0;
+    characterInit->itemsInInventory = 0;
 
     // Loop through map to place 'uninitialised' cells
     for (int y = 0; y < MAPSIZE; ++y) {
@@ -269,14 +279,20 @@ void viewInventory(player *characterPlayer){
                 // Check if item at selection
                 if (characterPlayer->inventory[selected].value != 0){
                     // Confirm removal of item
-                    printf("\nAre you sure you want to delete %s? Yes(1) or No(2)");
+                    printf("\nAre you sure you want to delete %s? Yes(1) or No(2)", characterPlayer->inventory[selected].name);
                     inventoryInput = 0;
                     while (inventoryInput == 0){
                         inventoryInput = getKey();
                         switch (inventoryInput) {
                             case 49:
-                                // Delete item
-                                characterPlayer->inventory[selected] = none;
+                                // Move last item to fill deleted items place
+                                if(selected != characterPlayer->itemsInInventory){
+                                    characterPlayer->inventory[selected] = characterPlayer->inventory[characterPlayer->itemsInInventory - 1];
+                                    characterPlayer->inventory[characterPlayer->itemsInInventory - 1] = none;
+                                }else{
+                                    characterPlayer->inventory[selected] = none;
+                                }
+                                characterPlayer->itemsInInventory--;
                                 printf("\nItem Removed");
                                 delay(1);
                                 break;
@@ -315,6 +331,7 @@ void viewInventory(player *characterPlayer){
     }
 }
 
+// Function to move the player around the grid
 void moveCharacter(int direction, player *characterToMove, cell (*mapToCheckMovement)[MAPSIZE]){
     int newX=0, newY=0;
     switch (direction) {
@@ -354,4 +371,25 @@ void moveCharacter(int direction, player *characterToMove, cell (*mapToCheckMove
         }
     }
     printf("\a");
+}
+
+// Function to allow player to mine ores/gems
+void mineItem(cell (*mapToEdit)[MAPSIZE], player *playerMining){
+    int x = playerMining->xCoordinate, y = playerMining->yCoordinate;
+    // Check if picking up item is valid or not
+    if (((mapToEdit[x][y].item.weight + playerMining->weightInBag) > playerMining->maximumWeight) | (playerMining->itemsInInventory == 10)){
+        printf("\a\nCannot pickup item! Remove or sell items in your inventory to pick it up.");
+        delay(1.5);
+        return;
+    }else{
+        // Add item to inventory
+        playerMining->inventory[playerMining->itemsInInventory] = mapToEdit[x][y].item;
+        playerMining->itemsInInventory++;
+        playerMining->weightInBag += mapToEdit[x][y].item.weight;
+
+        printf("\n%s mined successfully!", mapToEdit[x][y].item.name);
+        // Set item in map to ground
+        mapToEdit[x][y] = ground;
+        delay(1);
+    }
 }
