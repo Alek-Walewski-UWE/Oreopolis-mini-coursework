@@ -47,6 +47,7 @@ int main(){
         }
     }
 
+    time(&startTime);
     // Main game loop
     while(1){
         // Check if character is out of energy and run end game function if true
@@ -238,7 +239,7 @@ void displayMap(cell (*mapToDisplay)[MAPSIZE], int characterX, int characterY){
     }
 
     // Output map
-    printf(".------------------------------.\n");
+    printf(".------------------------------------.\n");
     for (int y = 0; y< MAPSIZE; ++y) {
         printf("|");
         for (int x = 0; x < MAPSIZE; ++x) {
@@ -246,7 +247,7 @@ void displayMap(cell (*mapToDisplay)[MAPSIZE], int characterX, int characterY){
         }
         printf("|\n");
     }
-    printf(".------------------------------.\n");
+    printf(".------------------------------------.\n");
 }
 
 // Function to display player inventory and allow inventory management
@@ -499,11 +500,27 @@ void openShop(player *shopPlayer){
 
 // Function to end the game
 void endGame(player *endPlayer, int endState){
+    char lbReadChar;
+    float timeTaken, secsTaken;
+    int minsTaken;
     system("cls");
+    timeTaken = difftime(time(NULL), startTime);
+    minsTaken = timeTaken / 60;
+    secsTaken = timeTaken - (minsTaken*60);
+
     switch (endState) {
         case 1:
             // Win
             printf("\nCongratulations you have won the game!");
+            currentFile = fopen(leaderboardFile, "a+");
+
+            if ((lbReadChar = (char)fgetc(currentFile)) == EOF){
+                fprintf(currentFile,"%s",LEADERBOARDHEADER);
+            }
+
+
+
+            fclose(currentFile);
             break;
         case 2:
             // Lose
@@ -513,6 +530,7 @@ void endGame(player *endPlayer, int endState){
             break;
     }
     showPlayerStats(endPlayer);
+    printf("\nTime taken: %d mins %.0f seconds", minsTaken, secsTaken);
     printf("\nPress enter to end the game");
     getch();
 }
