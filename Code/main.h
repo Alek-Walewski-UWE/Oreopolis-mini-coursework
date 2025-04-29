@@ -13,7 +13,10 @@
 #include <time.h>
 
 #define introductionFile "../Code/introduction.txt"
+#define leaderboardFile "../Code/leaderboard.txt"
 FILE* currentFile;
+
+#define LEADERBOARDHEADER "Rank|Name     |Difficulty|Time Taken\n------------------------------------"
 
 #define easyText "\nEasy(1): Highest chance of rare gems, 200 energy, no impassable cells\n"
 #define easyRarityFactor 3
@@ -30,8 +33,10 @@ FILE* currentFile;
 
 #define DEPLETIONFACTOR 0.2
 
-#define MAPSIZE 10
+#define MAPSIZE 12
 #define MONEYTOWIN 20
+
+time_t startTime;
 
 typedef struct{
     int value, weight;
