@@ -37,8 +37,9 @@ int main(){
                 break;
             case 50:
                 // Call function to read leaderboard
-
-                break;
+                viewLeaderboard();
+                userInput = 0;
+                goto mainMenu;
             case 51:
                 return 0;
             default:
@@ -134,6 +135,7 @@ void gameSetup(cell (*mapToInit)[MAPSIZE], player *characterInit){
         switch (difficulty) {
             case 49:
                 // Initiate easy difficulty variables
+                strcpy(&characterInit->selectedDifficulty,"Easy");
                 gemRarityFactor = easyRarityFactor;
                 impassables = easyImpassables;
                 characterInit->energy = easyPlayerEnergy;
@@ -141,6 +143,7 @@ void gameSetup(cell (*mapToInit)[MAPSIZE], player *characterInit){
                 break;
             case 50:
                 // Initiate normal difficulty variables
+                strcpy(&characterInit->selectedDifficulty,"Medium");
                 gemRarityFactor = normalRarityFactor;
                 impassables = normalImpassables;
                 characterInit->energy = normalPlayerEnergy;
@@ -148,6 +151,7 @@ void gameSetup(cell (*mapToInit)[MAPSIZE], player *characterInit){
                 break;
             case 51:
                 // Initiate hard mode difficulty
+                strcpy(&characterInit->selectedDifficulty,"Hard");
                 gemRarityFactor = hardRarityFactor;
                 impassables = hardImpassables;
                 characterInit->energy = hardPlayerEnergy;
@@ -500,7 +504,6 @@ void openShop(player *shopPlayer){
 
 // Function to end the game
 void endGame(player *endPlayer, int endState){
-    char lbReadChar;
     float timeTaken, secsTaken;
     int minsTaken;
     system("cls");
@@ -514,11 +517,12 @@ void endGame(player *endPlayer, int endState){
             printf("\nCongratulations you have won the game!");
             currentFile = fopen(leaderboardFile, "a+");
 
-            if ((lbReadChar = (char)fgetc(currentFile)) == EOF){
+            fseek(currentFile,0,SEEK_END);
+            if (ftell(currentFile) == 0){
                 fprintf(currentFile,"%s",LEADERBOARDHEADER);
             }
 
-
+            fprintf(currentFile, "%-9s|%-10s|%d:%.0f\n", endPlayer->name, endPlayer->selectedDifficulty, minsTaken, secsTaken);
 
             fclose(currentFile);
             break;
@@ -532,5 +536,19 @@ void endGame(player *endPlayer, int endState){
     showPlayerStats(endPlayer);
     printf("\nTime taken: %d mins %.0f seconds", minsTaken, secsTaken);
     printf("\nPress enter to end the game");
+    getch();
+}
+
+void viewLeaderboard(){
+    char readChar;
+    system("cls");
+    // Open file with introduction text
+    currentFile = fopen(leaderboardFile, "r");
+    // Loop through and print each char until end of file is reached
+    while((readChar = (char)fgetc(currentFile)) != EOF){
+        printf("%c", readChar);
+    }
+    fclose(currentFile);
+    printf("\nPress enter to exit the leaderboard");
     getch();
 }
