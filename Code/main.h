@@ -11,9 +11,13 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <time.h>
+#include <string.h>
 
 #define introductionFile "../Code/introduction.txt"
+#define leaderboardFile "../Code/leaderboard.txt"
 FILE* currentFile;
+
+#define LEADERBOARDHEADER "Name     |Difficulty|Time Taken\n-------------------------------\n"
 
 #define easyText "\nEasy(1): Highest chance of rare gems, 200 energy, no impassable cells\n"
 #define easyRarityFactor 3
@@ -30,8 +34,10 @@ FILE* currentFile;
 
 #define DEPLETIONFACTOR 0.2
 
-#define MAPSIZE 10
+#define MAPSIZE 12
 #define MONEYTOWIN 20
+
+time_t startTime;
 
 typedef struct{
     int value, weight;
@@ -57,7 +63,7 @@ cell ground = {.icon=' ', .mineable=0};
 typedef struct{
     int energy, defaultEnergy, maximumWeight, weightInBag, money, xCoordinate, yCoordinate, itemsInInventory;
     mineableItem inventory[10];
-    char name[20];
+    char name[20], selectedDifficulty[10];
 } player;
 
 typedef struct{
@@ -98,3 +104,4 @@ void moveCharacter(int direction, player *characterToMove, cell (*mapToCheckMove
 void mineItem(cell (*mapToEdit)[MAPSIZE], player *playerMining);
 void viewInventory(player *characterPlayer);
 void openShop(player *characterPlayer);
+void viewLeaderboard();

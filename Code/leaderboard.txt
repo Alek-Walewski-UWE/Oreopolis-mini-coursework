@@ -1,0 +1,4 @@
+Name     |Difficulty|Time Taken
+-------------------------------
+alek     |Medium    |0:23
+alek     |Easy      |0:25
