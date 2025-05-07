@@ -6,7 +6,7 @@ an eye on your energy levels!
 I - Iron ore
 G - Gold ore
 D - Diamond ore
-X - Impassable cell
+X - Impassable ground
 0 - Player
 
 TO BEGIN PRESS 1
