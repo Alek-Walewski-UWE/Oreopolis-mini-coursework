@@ -3,6 +3,12 @@ The goal of the game is to navigate the depths of Oreopolis collecting gems and 
 Not only is your bag storage limited, but the more weight you carry the more energy you will use so make sure you keep
 an eye on your energy levels!
 
+I - Iron ore
+G - Gold ore
+D - Diamond ore
+X - Impassable ground
+0 - Player
+
 TO BEGIN PRESS 1
 TO VIEW THE LEADERBOARD PRESS 2
 TO EXIT THE GAME PRESS 3

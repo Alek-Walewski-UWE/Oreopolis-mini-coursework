@@ -7,4 +7,7 @@ include_directories(Code)
 
 add_executable(Oreopolis_mini_coursework
         Code/main.c
-        Code/main.h)
+        Code/variables.c
+        Code/player.c
+        Code/game.c
+        )
